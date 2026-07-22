@@ -44,17 +44,25 @@ assert.match(root.innerHTML, /1回/);
 assert.doesNotMatch(root.innerHTML, /この行列式を計算/);
 assert.match(root.innerHTML, /class="timer"/);
 assert.match(root.innerHTML, /class="play-grid"/);
+assert.doesNotMatch(root.innerHTML, /回答記録を見る/);
 
 state.roundComplete = true;
 state.players[0].solved = true;
 state.players[0].timeSeconds = 12;
 state.players[0].roundScore = secretPenalty * 100n + 1200n;
 state.players[0].totalScore = secretPenalty * 100n + 1200n;
+state.players[0].attempts = [
+  { answer: 123456789n, difference: secretPenalty, correct: false },
+  { answer: -2n, difference: 0n, correct: true },
+];
 state.players[1].solved = true;
 state.players[1].timeSeconds = 10;
 state.players[1].roundScore = 1000n;
 state.players[1].totalScore = 1000n;
+state.players[1].attempts = [{ answer: -2n, difference: 0n, correct: true }];
 ui.renderProblem(state, () => {}, () => {}, () => {}, () => {});
 assert.match(root.innerHTML, /987654333\.00/);
+assert.match(root.innerHTML, /Player 1の回答記録を見る/);
+assert.match(root.innerHTML, /123456789/);
 
 console.log('Score privacy tests passed.');

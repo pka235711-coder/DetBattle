@@ -27,6 +27,9 @@ try {
   game.submitAnswer(firstCorrectAnswer);
   assert.equal(game.state.players[0].timeSeconds, 3);
   assert.equal(game.state.players[0].roundScore, 800n);
+  assert.equal(game.state.players[0].attempts.length, 2);
+  assert.equal(game.state.players[0].attempts[0].difference, 5n);
+  assert.equal(game.state.players[0].attempts[1].correct, true);
   assert.equal(game.state.activePlayerId, 2);
 
   now = game.state.roundStartedAt + 5_200;

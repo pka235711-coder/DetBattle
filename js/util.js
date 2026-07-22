@@ -19,7 +19,14 @@ export class Util {
     if (!Number.isInteger(weightHundredths) || weightHundredths < 0 || weightHundredths > 9999) {
       throw new RangeError('誤答ペナルティ倍率が範囲外です。');
     }
-    return BigInt(elapsedSeconds) * 100n + BigInt(errorPenalty) * BigInt(weightHundredths);
+    return BigInt(elapsedSeconds) * 100n + this.calculatePenalty(errorPenalty, weightHundredths);
+  }
+
+  static calculatePenalty(errorPenalty, weightHundredths = 100) {
+    if (!Number.isInteger(weightHundredths) || weightHundredths < 0 || weightHundredths > 9999) {
+      throw new RangeError('誤答ペナルティ倍率が範囲外です。');
+    }
+    return BigInt(errorPenalty) * BigInt(weightHundredths);
   }
 
   static formatHundredths(value) {

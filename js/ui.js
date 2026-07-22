@@ -61,15 +61,21 @@ export class UI {
         const previousTotal = player.totalScore - (player.roundScore ?? 0n);
         return `<tr><th>${player.name}</th><td>${player.solved ? '正解済み' : '挑戦中'}</td><td>${player.errors}回</td><td>${Util.formatHundredths(previousTotal)}</td></tr>`;
       }
-      return `<tr><th>${player.name}</th><td>${player.timeSeconds}秒</td><td>${player.errorPenalty}</td><td>${Util.formatHundredths(player.roundScore)}</td><td>${Util.formatHundredths(player.totalScore)}</td></tr>`;
+      const timePoints = Util.formatHundredths(BigInt(player.timeSeconds) * 100n);
+      const penaltyPoints = Util.formatHundredths(Util.calculatePenalty(player.errorPenalty, settings.penaltyWeightHundredths));
+      return `<tr><th>${player.name}</th><td>${timePoints}</td><td>${penaltyPoints}</td><td>${Util.formatHundredths(player.roundScore)}</td><td>${Util.formatHundredths(player.totalScore)}</td></tr>`;
     }).join('');
     const feedback = state.feedback ? `<p id="answerFeedback" class="answer-feedback ${state.feedback.type}" role="status">${state.feedback.message}</p>` : '<p id="answerFeedback" class="answer-feedback" role="status"></p>';
     const roundAction = state.roundComplete ? `<button id="advanceButton" type="button">${currentRound < settings.rounds ? '次のラウンドへ' : '最終結果を見る'}</button>` : '';
     const activePlayer = state.players.find((player) => player.id === state.activePlayerId);
 
     const scoreHead = state.roundComplete
-      ? '<tr><th>プレイヤー</th><th>時間</th><th>誤差合計</th><th>今回</th><th>合計</th></tr>'
+      ? '<tr><th>プレイヤー</th><th>秒数</th><th>ペナルティ</th><th>今回</th><th>合計</th></tr>'
       : '<tr><th>プレイヤー</th><th>状態</th><th>誤答</th><th>前回まで</th></tr>';
+    const histories = state.roundComplete ? `<div class="history-list">${state.players.map((player) => {
+      const rows = (player.attempts ?? []).map((attempt, index) => `<tr><td>${index + 1}回目</td><td>${attempt.answer}</td><td>${attempt.difference}</td><td>${attempt.correct ? '正解' : '誤答'}</td></tr>`).join('');
+      return `<section class="history-item"><button class="history-toggle secondary" type="button" aria-expanded="false" aria-controls="history-${player.id}" data-player-name="${player.name}">${player.name}の回答記録を見る</button><div id="history-${player.id}" class="answer-history"><div class="history-inner"><table class="history-table"><thead><tr><th>回数</th><th>回答値</th><th>正解との差</th><th>結果</th></tr></thead><tbody>${rows}</tbody></table></div></div></section>`;
+    }).join('')}</div>` : '';
     this.root.innerHTML = `<section class="game-screen">
       <header class="game-header">
         <p class="round-label">ラウンド ${currentRound} / ${settings.rounds}</p>
@@ -84,6 +90,7 @@ export class UI {
         </div>
       </div>
       <div class="score-table-wrap"><table class="score-table"><thead>${scoreHead}</thead><tbody>${scoreRows}</tbody></table></div>
+      ${histories}
       <div class="actions game-actions">${roundAction}<button id="changeSettingsButton" class="secondary" type="button">ゲームを終了</button></div>
     </section>`;
 
@@ -95,7 +102,14 @@ export class UI {
     this.root.querySelectorAll('.player-button').forEach((button) => button.addEventListener('click', () => onSelectPlayer(Number(button.dataset.playerId))));
     this.root.querySelector('#advanceButton')?.addEventListener('click', onAdvance);
     this.root.querySelector('#changeSettingsButton').addEventListener('click', onBack);
+    this.root.querySelectorAll('.history-toggle').forEach((button) => button.addEventListener('click', () => {
+      const panel = this.root.querySelector(`#${button.getAttribute('aria-controls')}`);
+      const isOpen = panel.classList.toggle('open');
+      button.setAttribute('aria-expanded', String(isOpen));
+      button.textContent = `${button.dataset.playerName}の回答記録を${isOpen ? '閉じる' : '見る'}`;
+    }));
     this.startTimer(state.roundStartedAt, state.roundComplete);
+    if (!state.roundComplete) this.root.querySelector('#answerInput').focus();
   }
 
   showAnswerError(message) {

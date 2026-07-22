@@ -52,6 +52,7 @@ export class Game {
       player.solved = false;
       player.errors = 0;
       player.errorPenalty = 0n;
+      player.attempts = [];
       player.timeSeconds = null;
       player.roundScore = null;
     });
@@ -63,6 +64,8 @@ export class Game {
       const answer = Util.parseIntegerAnswer(rawAnswer);
       const player = this.state.players.find(({ id }) => id === this.state.activePlayerId);
       if (!player || player.solved || this.state.roundComplete) return;
+      const difference = Util.absoluteDifference(answer, this.state.determinant);
+      player.attempts.push({ answer, difference, correct: difference === 0n });
 
       if (answer === this.state.determinant) {
         player.solved = true;
@@ -79,7 +82,7 @@ export class Game {
         }
       } else {
         player.errors += 1;
-        player.errorPenalty += Util.absoluteDifference(answer, this.state.determinant);
+        player.errorPenalty += difference;
         this.state.feedback = {
           type: 'incorrect',
           message: `${player.name}：不正解です。誤差が加算されました。`,
