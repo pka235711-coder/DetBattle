@@ -28,9 +28,11 @@ export class UI {
     if (minElement === maxElement) return '最小値と最大値には異なる値を指定してください。';
     return '';
   }
-  renderGamePlaceholder(state, onBack) {
+  renderProblem(state, onRegenerate, onBack) {
     const { settings, currentRound } = state;
-    this.root.innerHTML = `<section><h2>ゲーム準備完了</h2><p class="subtitle">次のコミットで問題を生成・表示します。</p><div class="status-card"><dl><dt>プレイヤー</dt><dd>${settings.players}人</dd><dt>ラウンド</dt><dd>${currentRound} / ${settings.rounds}</dd><dt>行列</dt><dd>${settings.matrixSize} × ${settings.matrixSize}</dd><dt>要素</dt><dd>${settings.minElement} 〜 ${settings.maxElement}</dd></dl></div><div class="actions"><button id="changeSettingsButton" class="secondary" type="button">設定に戻る</button></div></section>`;
+    const cells = state.matrix.flatMap((row) => row.map((value) => `<span>${value}</span>`)).join('');
+    this.root.innerHTML = `<section><div class="game-header"><p>ラウンド ${currentRound} / ${settings.rounds}</p><p>${settings.matrixSize} × ${settings.matrixSize}</p></div><h2>この行列式を計算</h2><div class="matrix-wrap" aria-label="計算する行列"><div class="matrix" style="--matrix-size:${settings.matrixSize}">${cells}</div></div><p class="calculation-status">正解は判定用に計算済みです。</p><div class="actions"><button id="regenerateButton" type="button">別の行列を生成</button><button id="changeSettingsButton" class="secondary" type="button">設定に戻る</button></div></section>`;
+    this.root.querySelector('#regenerateButton').addEventListener('click', onRegenerate);
     this.root.querySelector('#changeSettingsButton').addEventListener('click', onBack);
   }
 }

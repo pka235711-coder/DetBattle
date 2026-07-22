@@ -1,0 +1,30 @@
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  color: #647085;
+  font-weight: 700;
+}
+.game-header p { margin: 0; }
+.matrix-wrap { display: flex; justify-content: center; margin: 32px 0; overflow-x: auto; }
+.matrix {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--matrix-size), minmax(42px, 1fr));
+  gap: 16px;
+  padding: 14px 22px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: clamp(19px, 5vw, 28px);
+  font-weight: 700;
+}
+.matrix::before, .matrix::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 12px;
+  border-top: 3px solid #172033;
+  border-bottom: 3px solid #172033;
+}
+.matrix::before { left: 0; border-left: 3px solid #172033; }
+.matrix::after { left: auto; right: 0; border-right: 3px solid #172033; }
+.matrix span { min-width: 36px; text-align: center; }
+.calculation-status { text-align: center; color: #647085; font-size: 14px; }
