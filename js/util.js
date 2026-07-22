@@ -12,10 +12,20 @@ export class Util {
     return difference < 0n ? -difference : difference;
   }
 
-  static calculateScore(elapsedSeconds, errorPenalty) {
+  static calculateScore(elapsedSeconds, errorPenalty, weightHundredths = 100) {
     if (!Number.isInteger(elapsedSeconds) || elapsedSeconds < 0) {
       throw new RangeError('経過時間は0以上の整数にしてください。');
     }
-    return BigInt(elapsedSeconds) + BigInt(errorPenalty);
+    if (!Number.isInteger(weightHundredths) || weightHundredths < 0 || weightHundredths > 9999) {
+      throw new RangeError('誤答ペナルティ倍率が範囲外です。');
+    }
+    return BigInt(elapsedSeconds) * 100n + BigInt(errorPenalty) * BigInt(weightHundredths);
+  }
+
+  static formatHundredths(value) {
+    const amount = BigInt(value);
+    const sign = amount < 0n ? '-' : '';
+    const absolute = amount < 0n ? -amount : amount;
+    return `${sign}${absolute / 100n}.${String(absolute % 100n).padStart(2, '0')}`;
   }
 }

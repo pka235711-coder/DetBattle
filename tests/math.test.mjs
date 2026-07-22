@@ -22,6 +22,10 @@ assert.throws(() => Util.parseIntegerAnswer('1.5'), /整数/);
 assert.throws(() => Util.parseIntegerAnswer(''), /整数/);
 assert.equal(Util.absoluteDifference(-10n, 4n), 14n);
 assert.equal(Util.absoluteDifference(9n, 4n), 5n);
-assert.equal(Util.calculateScore(12, 8n), 20n);
+assert.equal(Util.calculateScore(12, 8n), 2000n);
+assert.equal(Util.calculateScore(12, 8n, 25), 1400n);
+assert.equal(Util.calculateScore(12, 8n, 0), 1200n);
+assert.equal(Util.formatHundredths(1400n), '14.00');
+assert.equal(Util.formatHundredths(1405n), '14.05');
 
 console.log('All math tests passed.');

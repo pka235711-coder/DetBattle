@@ -26,12 +26,12 @@ try {
   now = game.state.roundStartedAt + 3_900;
   game.submitAnswer(firstCorrectAnswer);
   assert.equal(game.state.players[0].timeSeconds, 3);
-  assert.equal(game.state.players[0].roundScore, 8n);
+  assert.equal(game.state.players[0].roundScore, 800n);
   assert.equal(game.state.activePlayerId, 2);
 
   now = game.state.roundStartedAt + 5_200;
   game.submitAnswer(firstCorrectAnswer);
-  assert.equal(game.state.players[1].roundScore, 5n);
+  assert.equal(game.state.players[1].roundScore, 500n);
   assert.equal(game.state.roundComplete, true);
 
   game.advanceRound();
@@ -62,6 +62,13 @@ try {
   game.advanceRound();
   assert.equal(game.state.screen, 'results');
   assert.equal(resultsRendered, true);
+
+  game.startGame({ rounds: 1, matrixSize: 2, minElement: -2, maxElement: 2, penaltyWeightHundredths: 25 });
+  const weightedAnswer = game.state.determinant;
+  game.submitAnswer((weightedAnswer + 4n).toString());
+  now = game.state.roundStartedAt + 2_900;
+  game.submitAnswer(weightedAnswer.toString());
+  assert.equal(game.state.players[0].roundScore, 300n);
 } finally {
   Date.now = realNow;
 }

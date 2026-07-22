@@ -3,7 +3,7 @@ import { MatrixGenerator } from './generator.js';
 import { DeterminantCalculator } from './determinant.js';
 import { Util } from './util.js';
 
-const DEFAULT_SETTINGS = Object.freeze({ players: 2, rounds: 3, matrixSize: 4, minElement: -9, maxElement: 9 });
+const DEFAULT_SETTINGS = Object.freeze({ players: 2, rounds: 3, matrixSize: 4, minElement: -9, maxElement: 9, penaltyWeightHundredths: 100 });
 
 export class Game {
   constructor() {
@@ -67,7 +67,7 @@ export class Game {
       if (answer === this.state.determinant) {
         player.solved = true;
         player.timeSeconds = Math.floor((Date.now() - this.state.roundStartedAt) / 1000);
-        player.roundScore = Util.calculateScore(player.timeSeconds, player.errorPenalty);
+        player.roundScore = Util.calculateScore(player.timeSeconds, player.errorPenalty, this.state.settings.penaltyWeightHundredths);
         player.totalScore += player.roundScore;
         this.state.feedback = { type: 'correct', message: `${player.name}：正解です！` };
 
