@@ -13,6 +13,10 @@ class FakeRoot {
 
 const root = new FakeRoot();
 const ui = new UI(root);
+assert.equal(ui.validateSettings({ rounds: 1, matrixSize: 2, minElement: -9, maxElement: 9 }), '');
+assert.equal(ui.validateSettings({ rounds: 100, matrixSize: 5, minElement: -9, maxElement: 9 }), '');
+assert.match(ui.validateSettings({ rounds: 0, matrixSize: 2, minElement: -9, maxElement: 9 }), /ラウンド数/);
+assert.match(ui.validateSettings({ rounds: 1.5, matrixSize: 2, minElement: -9, maxElement: 9 }), /ラウンド数/);
 const secretPenalty = 987654321n;
 const state = {
   settings: { rounds: 3, matrixSize: 2 },

@@ -17,8 +17,9 @@ export class UI {
 
   renderSettings(settings, onSubmit, onBack) {
     this.clearTimer();
-    this.root.innerHTML = `<section><h2>ゲーム設定</h2><p class="rule-summary">2人・全3ラウンド</p>
+    this.root.innerHTML = `<section><h2>ゲーム設定</h2><p class="rule-summary">2人対戦</p>
       <form id="settingsForm" class="settings" novalidate>
+        <label class="field"><span>ラウンド数</span><input name="rounds" type="number" min="1" max="100" step="1" value="${settings.rounds}"><span class="help">1〜100の整数</span></label>
         <label class="field"><span>行列サイズ</span><select name="matrixSize">${[2, 3, 4, 5].map((size) => `<option value="${size}" ${size === settings.matrixSize ? 'selected' : ''}>${size} × ${size}</option>`).join('')}</select></label>
         <div class="field"><span>要素の範囲</span><div class="range-fields"><input name="minElement" type="number" step="1" value="${settings.minElement}" aria-label="要素の最小値"><span>〜</span><input name="maxElement" type="number" step="1" value="${settings.maxElement}" aria-label="要素の最大値"></div><p class="help">最小値と最大値を整数で入力してください。</p></div>
         <p id="settingsError" class="error" role="alert"></p><div class="actions"><button type="submit">この設定で開始</button><button id="backButton" class="secondary" type="button">戻る</button></div>
@@ -26,7 +27,7 @@ export class UI {
     const form = this.root.querySelector('#settingsForm');
     form.addEventListener('submit', (event) => {
       event.preventDefault();
-      const values = { matrixSize: Number(form.elements.matrixSize.value), minElement: Number(form.elements.minElement.value), maxElement: Number(form.elements.maxElement.value) };
+      const values = { rounds: Number(form.elements.rounds.value), matrixSize: Number(form.elements.matrixSize.value), minElement: Number(form.elements.minElement.value), maxElement: Number(form.elements.maxElement.value) };
       const error = this.validateSettings(values);
       this.root.querySelector('#settingsError').textContent = error;
       if (!error) onSubmit(values);
@@ -34,7 +35,8 @@ export class UI {
     this.root.querySelector('#backButton').addEventListener('click', onBack);
   }
 
-  validateSettings({ matrixSize, minElement, maxElement }) {
+  validateSettings({ rounds, matrixSize, minElement, maxElement }) {
+    if (!Number.isInteger(rounds) || rounds < 1 || rounds > 100) return 'ラウンド数は1〜100の整数にしてください。';
     if (![2, 3, 4, 5].includes(matrixSize)) return '行列サイズを選択してください。';
     if (!Number.isInteger(minElement) || !Number.isInteger(maxElement)) return '要素の範囲には整数を入力してください。';
     if (minElement > maxElement) return '最小値は最大値以下にしてください。';

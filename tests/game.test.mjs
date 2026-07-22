@@ -50,6 +50,18 @@ try {
 
   assert.equal(game.state.screen, 'results');
   assert.equal(resultsRendered, true);
+
+  resultsRendered = false;
+  game.startGame({ rounds: 1, matrixSize: 2, minElement: -2, maxElement: 2 });
+  assert.equal(game.state.settings.rounds, 1);
+  const oneRoundAnswer = game.state.determinant.toString();
+  now = game.state.roundStartedAt + 1_000;
+  game.submitAnswer(oneRoundAnswer);
+  now = game.state.roundStartedAt + 2_000;
+  game.submitAnswer(oneRoundAnswer);
+  game.advanceRound();
+  assert.equal(game.state.screen, 'results');
+  assert.equal(resultsRendered, true);
 } finally {
   Date.now = realNow;
 }
