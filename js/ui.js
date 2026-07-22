@@ -28,11 +28,35 @@ export class UI {
     if (minElement === maxElement) return '最小値と最大値には異なる値を指定してください。';
     return '';
   }
-  renderProblem(state, onRegenerate, onBack) {
+  renderProblem(state, onSubmit, onRegenerate, onBack) {
     const { settings, currentRound } = state;
     const cells = state.matrix.flatMap((row) => row.map((value) => `<span>${value}</span>`)).join('');
-    this.root.innerHTML = `<section><div class="game-header"><p>ラウンド ${currentRound} / ${settings.rounds}</p><p>${settings.matrixSize} × ${settings.matrixSize}</p></div><h2>この行列式を計算</h2><div class="matrix-wrap" aria-label="計算する行列"><div class="matrix" style="--matrix-size:${settings.matrixSize}">${cells}</div></div><p class="calculation-status">正解は判定用に計算済みです。</p><div class="actions"><button id="regenerateButton" type="button">別の行列を生成</button><button id="changeSettingsButton" class="secondary" type="button">設定に戻る</button></div></section>`;
+    this.root.innerHTML = `<section><div class="game-header"><p>ラウンド ${currentRound} / ${settings.rounds}</p><p>${settings.matrixSize} × ${settings.matrixSize}</p></div><h2>この行列式を計算</h2><div class="matrix-wrap" aria-label="計算する行列"><div class="matrix" style="--matrix-size:${settings.matrixSize}">${cells}</div></div><form id="answerForm" class="answer-form" novalidate><label for="answerInput">行列式</label><div class="answer-controls"><input id="answerInput" name="answer" type="text" inputmode="numeric" autocomplete="off" aria-describedby="answerFeedback" autofocus><button id="answerButton" type="submit">回答する</button></div><p id="answerFeedback" class="answer-feedback" role="status"></p></form><div class="actions"><button id="regenerateButton" class="secondary" type="button">別の行列を生成</button><button id="changeSettingsButton" class="secondary" type="button">設定に戻る</button></div></section>`;
+    const form = this.root.querySelector('#answerForm');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      onSubmit(form.elements.answer.value);
+    });
     this.root.querySelector('#regenerateButton').addEventListener('click', onRegenerate);
     this.root.querySelector('#changeSettingsButton').addEventListener('click', onBack);
+  }
+
+  showAnswerResult(isCorrect) {
+    const feedback = this.root.querySelector('#answerFeedback');
+    feedback.textContent = isCorrect ? '正解です！' : '不正解です。もう一度考えてみましょう。';
+    feedback.className = `answer-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    if (isCorrect) {
+      this.root.querySelector('#answerInput').disabled = true;
+      this.root.querySelector('#answerButton').disabled = true;
+    } else {
+      this.root.querySelector('#answerInput').select();
+    }
+  }
+
+  showAnswerError(message) {
+    const feedback = this.root.querySelector('#answerFeedback');
+    feedback.textContent = message;
+    feedback.className = 'answer-feedback input-error';
+    this.root.querySelector('#answerInput').focus();
   }
 }

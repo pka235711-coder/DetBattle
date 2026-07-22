@@ -1,6 +1,7 @@
 import { UI } from './ui.js';
 import { MatrixGenerator } from './generator.js';
 import { DeterminantCalculator } from './determinant.js';
+import { Util } from './util.js';
 
 const DEFAULT_SETTINGS = Object.freeze({ players: 2, rounds: 10, matrixSize: 4, minElement: -9, maxElement: 9 });
 
@@ -29,6 +30,20 @@ export class Game {
     const { matrixSize, minElement, maxElement } = this.state.settings;
     this.state.matrix = this.generator.generate(matrixSize, minElement, maxElement);
     this.state.determinant = this.calculator.calculate(this.state.matrix);
-    this.ui.renderProblem(this.state, () => this.prepareRound(), () => this.showSettings());
+    this.ui.renderProblem(
+      this.state,
+      (answer) => this.submitAnswer(answer),
+      () => this.prepareRound(),
+      () => this.showSettings(),
+    );
+  }
+
+  submitAnswer(rawAnswer) {
+    try {
+      const answer = Util.parseIntegerAnswer(rawAnswer);
+      this.ui.showAnswerResult(answer === this.state.determinant);
+    } catch (error) {
+      this.ui.showAnswerError(error.message);
+    }
   }
 }

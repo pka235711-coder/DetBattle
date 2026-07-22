@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { MatrixGenerator } from '../js/generator.js';
 import { DeterminantCalculator } from '../js/determinant.js';
+import { Util } from '../js/util.js';
 
 const calculator = new DeterminantCalculator();
 assert.equal(calculator.calculate([[1, 2], [3, 4]]), -2n);
@@ -14,5 +15,10 @@ const generated = generator.generate(5, -9, 9);
 assert.equal(generated.length, 5);
 assert.ok(generated.every((row) => row.length === 5));
 assert.ok(generated.flat().every((value) => Number.isInteger(value) && value >= -9 && value <= 9));
+
+assert.equal(Util.parseIntegerAnswer(' -42 '), -42n);
+assert.equal(Util.parseIntegerAnswer('+17'), 17n);
+assert.throws(() => Util.parseIntegerAnswer('1.5'), /整数/);
+assert.throws(() => Util.parseIntegerAnswer(''), /整数/);
 
 console.log('All math tests passed.');

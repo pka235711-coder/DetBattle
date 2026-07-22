@@ -28,3 +28,12 @@
 .matrix::after { left: auto; right: 0; border-right: 3px solid #172033; }
 .matrix span { min-width: 36px; text-align: center; }
 .calculation-status { text-align: center; color: #647085; font-size: 14px; }
+.answer-form { margin-top: 28px; }
+.answer-form > label { display: block; margin-bottom: 8px; font-weight: 700; }
+.answer-controls { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+.answer-controls input { text-align: right; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 22px; }
+.answer-feedback { min-height: 28px; margin: 12px 0 0; font-weight: 700; }
+.answer-feedback.correct { color: #067647; }
+.answer-feedback.incorrect, .answer-feedback.input-error { color: #b42318; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+@media (max-width: 460px) { .answer-controls { grid-template-columns: 1fr; } }
