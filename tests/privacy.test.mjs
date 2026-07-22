@@ -24,7 +24,7 @@ assert.match(ui.validateSettings({ ...validSettings, weightDecimalText: '5', pen
 assert.match(ui.validateSettings({ ...validSettings, weightIntegerText: '' }), /倍率/);
 const secretPenalty = 987654321n;
 const state = {
-  settings: { rounds: 3, matrixSize: 2 },
+  settings: { rounds: 3, matrixSize: 2, penaltyWeightHundredths: 100 },
   currentRound: 1,
   matrix: [[1, 2], [3, 4]],
   activePlayerId: 1,
@@ -41,6 +41,9 @@ ui.renderProblem(state, () => {}, () => {}, () => {}, () => {});
 ui.clearTimer();
 assert.doesNotMatch(root.innerHTML, /987654321/);
 assert.match(root.innerHTML, /1回/);
+assert.doesNotMatch(root.innerHTML, /この行列式を計算/);
+assert.match(root.innerHTML, /class="timer"/);
+assert.match(root.innerHTML, /class="play-grid"/);
 
 state.roundComplete = true;
 state.players[0].solved = true;

@@ -70,7 +70,22 @@ export class UI {
     const scoreHead = state.roundComplete
       ? '<tr><th>プレイヤー</th><th>時間</th><th>誤差合計</th><th>今回</th><th>合計</th></tr>'
       : '<tr><th>プレイヤー</th><th>状態</th><th>誤答</th><th>前回まで</th></tr>';
-    this.root.innerHTML = `<section><div class="game-header"><p>ラウンド ${currentRound} / ${settings.rounds}</p><p id="timer">0秒</p></div><h2>この行列式を計算</h2><div class="matrix-wrap" aria-label="計算する行列"><div class="matrix" style="--matrix-size:${settings.matrixSize}">${cells}</div></div><div class="player-selector" aria-label="回答するプレイヤー">${playerButtons}</div><form id="answerForm" class="answer-form" novalidate><label for="answerInput">${state.roundComplete ? '両プレイヤー正解' : `${activePlayer.name} の回答`}</label><div class="answer-controls"><input id="answerInput" name="answer" type="text" inputmode="numeric" autocomplete="off" aria-describedby="answerFeedback" ${state.roundComplete ? 'disabled' : 'autofocus'}><button id="answerButton" type="submit" ${state.roundComplete ? 'disabled' : ''}>回答する</button></div>${feedback}</form><div class="score-table-wrap"><table class="score-table"><thead>${scoreHead}</thead><tbody>${scoreRows}</tbody></table></div><div class="actions">${roundAction}<button id="changeSettingsButton" class="secondary" type="button">ゲームを終了</button></div></section>`;
+    this.root.innerHTML = `<section class="game-screen">
+      <header class="game-header">
+        <p class="round-label">ラウンド ${currentRound} / ${settings.rounds}</p>
+        <p id="timer" class="timer">0秒</p>
+        <p class="weight-label">誤答 ×${Util.formatHundredths(settings.penaltyWeightHundredths)}</p>
+      </header>
+      <div class="play-grid">
+        <div class="matrix-panel"><div class="matrix-wrap" aria-label="計算する行列"><div class="matrix" style="--matrix-size:${settings.matrixSize}">${cells}</div></div></div>
+        <div class="answer-panel">
+          <div class="player-selector" aria-label="回答するプレイヤー">${playerButtons}</div>
+          <form id="answerForm" class="answer-form" novalidate><label for="answerInput">${state.roundComplete ? '両プレイヤー正解' : `${activePlayer.name} の回答`}</label><div class="answer-controls"><input id="answerInput" name="answer" type="text" inputmode="numeric" autocomplete="off" aria-describedby="answerFeedback" ${state.roundComplete ? 'disabled' : 'autofocus'}><button id="answerButton" type="submit" ${state.roundComplete ? 'disabled' : ''}>回答する</button></div>${feedback}</form>
+        </div>
+      </div>
+      <div class="score-table-wrap"><table class="score-table"><thead>${scoreHead}</thead><tbody>${scoreRows}</tbody></table></div>
+      <div class="actions game-actions">${roundAction}<button id="changeSettingsButton" class="secondary" type="button">ゲームを終了</button></div>
+    </section>`;
 
     const form = this.root.querySelector('#answerForm');
     form.addEventListener('submit', (event) => {
