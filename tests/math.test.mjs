@@ -20,5 +20,8 @@ assert.equal(Util.parseIntegerAnswer(' -42 '), -42n);
 assert.equal(Util.parseIntegerAnswer('+17'), 17n);
 assert.throws(() => Util.parseIntegerAnswer('1.5'), /整数/);
 assert.throws(() => Util.parseIntegerAnswer(''), /整数/);
+assert.equal(Util.absoluteDifference(-10n, 4n), 14n);
+assert.equal(Util.absoluteDifference(9n, 4n), 5n);
+assert.equal(Util.calculateScore(12, 8n), 20n);
 
 console.log('All math tests passed.');
