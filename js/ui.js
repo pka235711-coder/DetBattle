@@ -47,12 +47,21 @@ export class UI {
     const { settings, currentRound } = state;
     const cells = state.matrix.flatMap((row) => row.map((value) => `<span>${value}</span>`)).join('');
     const playerButtons = state.players.map((player) => `<button class="player-button ${player.id === state.activePlayerId ? 'active' : ''} ${player.solved ? 'solved' : ''}" type="button" data-player-id="${player.id}" ${player.solved || state.roundComplete ? 'disabled' : ''}>${player.name}${player.solved ? ' ✓' : ''}</button>`).join('');
-    const scoreRows = state.players.map((player) => `<tr><th>${player.name}</th><td>${player.solved ? `${player.timeSeconds}秒` : '挑戦中'}</td><td>${player.errorPenalty}</td><td>${player.roundScore ?? '—'}</td><td>${player.totalScore}</td></tr>`).join('');
+    const scoreRows = state.players.map((player) => {
+      if (!state.roundComplete) {
+        const previousTotal = player.totalScore - (player.roundScore ?? 0n);
+        return `<tr><th>${player.name}</th><td>${player.solved ? '正解済み' : '挑戦中'}</td><td>${player.errors}回</td><td>${previousTotal}</td></tr>`;
+      }
+      return `<tr><th>${player.name}</th><td>${player.timeSeconds}秒</td><td>${player.errorPenalty}</td><td>${player.roundScore}</td><td>${player.totalScore}</td></tr>`;
+    }).join('');
     const feedback = state.feedback ? `<p id="answerFeedback" class="answer-feedback ${state.feedback.type}" role="status">${state.feedback.message}</p>` : '<p id="answerFeedback" class="answer-feedback" role="status"></p>';
     const roundAction = state.roundComplete ? `<button id="advanceButton" type="button">${currentRound < settings.rounds ? '次のラウンドへ' : '最終結果を見る'}</button>` : '';
     const activePlayer = state.players.find((player) => player.id === state.activePlayerId);
 
-    this.root.innerHTML = `<section><div class="game-header"><p>ラウンド ${currentRound} / ${settings.rounds}</p><p id="timer">0秒</p></div><h2>この行列式を計算</h2><div class="matrix-wrap" aria-label="計算する行列"><div class="matrix" style="--matrix-size:${settings.matrixSize}">${cells}</div></div><div class="player-selector" aria-label="回答するプレイヤー">${playerButtons}</div><form id="answerForm" class="answer-form" novalidate><label for="answerInput">${state.roundComplete ? '両プレイヤー正解' : `${activePlayer.name} の回答`}</label><div class="answer-controls"><input id="answerInput" name="answer" type="text" inputmode="numeric" autocomplete="off" aria-describedby="answerFeedback" ${state.roundComplete ? 'disabled' : 'autofocus'}><button id="answerButton" type="submit" ${state.roundComplete ? 'disabled' : ''}>回答する</button></div>${feedback}</form><div class="score-table-wrap"><table class="score-table"><thead><tr><th>プレイヤー</th><th>時間</th><th>誤差</th><th>今回</th><th>合計</th></tr></thead><tbody>${scoreRows}</tbody></table></div><div class="actions">${roundAction}<button id="changeSettingsButton" class="secondary" type="button">ゲームを終了</button></div></section>`;
+    const scoreHead = state.roundComplete
+      ? '<tr><th>プレイヤー</th><th>時間</th><th>誤差合計</th><th>今回</th><th>合計</th></tr>'
+      : '<tr><th>プレイヤー</th><th>状態</th><th>誤答</th><th>前回まで</th></tr>';
+    this.root.innerHTML = `<section><div class="game-header"><p>ラウンド ${currentRound} / ${settings.rounds}</p><p id="timer">0秒</p></div><h2>この行列式を計算</h2><div class="matrix-wrap" aria-label="計算する行列"><div class="matrix" style="--matrix-size:${settings.matrixSize}">${cells}</div></div><div class="player-selector" aria-label="回答するプレイヤー">${playerButtons}</div><form id="answerForm" class="answer-form" novalidate><label for="answerInput">${state.roundComplete ? '両プレイヤー正解' : `${activePlayer.name} の回答`}</label><div class="answer-controls"><input id="answerInput" name="answer" type="text" inputmode="numeric" autocomplete="off" aria-describedby="answerFeedback" ${state.roundComplete ? 'disabled' : 'autofocus'}><button id="answerButton" type="submit" ${state.roundComplete ? 'disabled' : ''}>回答する</button></div>${feedback}</form><div class="score-table-wrap"><table class="score-table"><thead>${scoreHead}</thead><tbody>${scoreRows}</tbody></table></div><div class="actions">${roundAction}<button id="changeSettingsButton" class="secondary" type="button">ゲームを終了</button></div></section>`;
 
     const form = this.root.querySelector('#answerForm');
     form.addEventListener('submit', (event) => {
